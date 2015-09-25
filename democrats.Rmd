@@ -1,0 +1,63 @@
+---
+title: "Democratic Presidential Candidates"
+author: "Heike Hofmann"
+date: "September 24, 2015"
+output: html_document
+---
+
+```{r, echo=FALSE, fig.width=10, fig.height=7, message=FALSE}
+library(XML)
+library(lubridate)
+library(plyr)
+library(reshape2)
+library(ggplot2)
+library(RColorBrewer)
+
+###############
+#  functions
+sub <- function(x, replace=c("--"), by=NA) {
+  x <- as.character(x)
+  idx <- which(x %in% replace)
+  if (length(idx) > 0) x[idx] <- by
+  x
+}
+
+###############
+# show! 
+rcp.dem <- "http://www.realclearpolitics.com/epolls/2016/president/us/2016_democratic_presidential_nomination-3824.html"
+
+tables <- readHTMLTable(rcp.dem)
+dems <- data.frame(tables[[6]])
+
+dems <- dems[nrow(dems):1,]
+
+demsNA <- lapply(dems, sub)
+write.csv(demsNA, "temp.csv", row.names=FALSE)
+dems <- read.csv("temp.csv")
+dems$year <- 2015
+dems$year[1] <- 2012
+dems$year[2:18] <- 2013
+dems$year[20:38] <- 2014
+
+dates <- strsplit(as.character(dems$Date), split=" - ")
+d2 <- ldply(dates, function(x) data.frame(
+  startDate = mdy(paste(x[1],"15", sep="/")),
+  endDate = mdy(paste(x[2],"15", sep="/"))))
+year(d2$startDate) <- dems$year
+year(d2$endDate) <- dems$year
+
+dems <- data.frame(dems, d2)
+
+mdems <- melt(dems, measure.vars=4:9, na.rm=TRUE)
+mdems <- subset(mdems, Poll != "RCP Average")
+
+
+cols <- c(brewer.pal(12, name="Paired"), "grey30")
+qplot(x=startDate, xend=endDate, yend=value, y=value, colour=Poll, facets=~variable, size=I(1.5), data=subset(mdems, year >=2015), geom="segment") +
+  geom_point(aes(x=endDate, y=value), size=2.5) + 
+  geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
+  scale_colour_manual(values=cols) + theme_bw() +
+  theme(legend.position="bottom") + xlab("Date of Poll") + ylab("Percent")
+
+
+```
