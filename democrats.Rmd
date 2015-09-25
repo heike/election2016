@@ -1,7 +1,6 @@
 ---
 title: "Democratic Presidential Candidates"
 author: "Heike Hofmann"
-date: "September 24, 2015"
 output: html_document
 ---
 
@@ -45,19 +44,29 @@ d2 <- ldply(dates, function(x) data.frame(
   endDate = mdy(paste(x[2],"15", sep="/"))))
 year(d2$startDate) <- dems$year
 year(d2$endDate) <- dems$year
-
 dems <- data.frame(dems, d2)
+
+samples <- strsplit(as.character(dems$Sample), split=" ")
+s2 <- ldply(samples, function(x) data.frame(
+  pollSize=suppressWarnings(as.numeric(x[1])),
+  voterType=x[2]
+))
+s2$voterType[is.na(s2$voterType)] <- dems$Sample[is.na(s2$voterType)]
+dems <- data.frame(dems, s2)
+
 
 mdems <- melt(dems, measure.vars=4:9, na.rm=TRUE)
 mdems <- subset(mdems, Poll != "RCP Average")
 
 
 cols <- c(brewer.pal(12, name="Paired"), "grey30")
-qplot(x=startDate, xend=endDate, yend=value, y=value, colour=Poll, facets=~variable, size=I(1.5), data=subset(mdems, year >=2015), geom="segment") +
-  geom_point(aes(x=endDate, y=value), size=2.5) + 
-  geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
-  scale_colour_manual(values=cols) + theme_bw() +
-  theme(legend.position="bottom") + xlab("Date of Poll") + ylab("Percent")
 
+ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mdems, year >=2015)) +
+  geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
+  geom_point(aes(x=endDate, y=value, shape=voterType), size=2.5, alpha=0.9) + 
+  scale_colour_manual(values=cols) + theme_bw() +
+  theme(legend.position="bottom") + xlab("Date of Poll") + ylab("Percent") +
+  facet_wrap(~variable) +
+  scale_shape_manual("Type of Poll",values=c(19, 4, 1))
 
 ```

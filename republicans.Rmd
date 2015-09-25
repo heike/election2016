@@ -1,11 +1,11 @@
 ---
 title: "Republican Presidential Candidates"
 author: "Heike Hofmann"
-date: "September 24, 2015"
 output: html_document
 ---
 
-Polling results in percentage points for all Republican Presidential candidates. Polls from major pollsters are shown (by color), the line is a non-parametric loess smooth to show the trend over time. Only polls since the beginning of the year are included.
+Polling results in percentage points for all Republican Presidential candidates. Polls from major pollsters are shown (by color), the line is a non-parametric loess smooth to show the trend over time. Only polls since the beginning of 2015 are included.
+
 
 ```{r, echo=FALSE, fig.width=10, fig.height=10, message=FALSE}
 library(XML)
@@ -47,16 +47,17 @@ year(d2$endDate) <- reps$year
 
 reps <- data.frame(reps, d2)
 
+
 mreps <- melt(reps, measure.vars=3:17, na.rm=TRUE)
 mreps <- subset(mreps, Poll != "RCP Average")
 
 
 cols <- c(brewer.pal(12, name="Paired"), "grey30")
-qplot(x=startDate, xend=endDate, yend=value, y=value, colour=Poll, 
-      facets=~variable, size=I(1.5), data=subset(mreps, year >=2015), geom="segment") +
-  geom_point(aes(x=endDate, y=value), size=2.5) + 
+ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mreps, year >=2015)) +
   geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
+  geom_point(aes(x=endDate, y=value), size=2.5, alpha=0.9) + 
   scale_colour_manual(values=cols) + theme_bw() +
-  theme(legend.position="bottom") + xlab("Date of Poll") + ylab("Percent")
+  theme(legend.position="bottom") + xlab("Date of Poll") + ylab("Percent") +
+  facet_wrap(~variable) 
 
 ```

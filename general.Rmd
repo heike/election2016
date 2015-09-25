@@ -65,7 +65,7 @@ plotCandidates <- function(rcp.gen) {
   ggplot(aes(colour=Poll), data=gen) +
     geom_hline(yintercept=0, colour="grey80") +
     sm_layer + 
-    geom_point(aes(x=endDate, y=value), size=2.5) + 
+    geom_point(aes(x=endDate, y=value), size=2.5, alpha=0.9) + 
     geom_segment(aes(x=startDate, xend=endDate, yend=value, y=value), size=1.5) +
     scale_colour_manual(values=cols) + theme_bw() +
     theme(legend.position="bottom") + xlab("Date of Poll") + 
