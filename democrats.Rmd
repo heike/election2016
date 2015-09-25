@@ -1,0 +1,24 @@
+---
+title: "Democratic Presidential Candidates"
+author: "Heike Hofmann"
+date: "September 24, 2015"
+output: html_document
+---
+
+```{r, echo=FALSE, fig.width=10, fig.height=10, message=FALSE}
+library(XML)
+library(lubridate)
+library(plyr)
+library(reshape2)
+library(ggplot2)
+library(RColorBrewer)
+
+###############
+#  functions
+sub <- function(x, replace=c("--"), by=NA) {
+  x <- as.character(x)
+  idx <- which(x %in% replace)
+  if (length(idx) > 0) x[idx] <- by
+  x
+}
+```
