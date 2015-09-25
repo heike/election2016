@@ -6,7 +6,7 @@ output: html_document
 ---
 
 
-```{r, echo=FALSE, fig.width=10, fig.height=10, message=FALSE}
+```{r, echo=FALSE, fig.width=7, fig.height=5, message=FALSE}
 library(XML)
 library(lubridate)
 library(plyr)
