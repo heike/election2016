@@ -52,12 +52,16 @@ mreps <- melt(reps, measure.vars=3:17, na.rm=TRUE)
 mreps <- subset(mreps, Poll != "RCP Average")
 
 
-cols <- c(brewer.pal(12, name="Paired"), "grey30")
-ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mreps, year >=2015)) +
-  geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
-  geom_point(aes(x=endDate, y=value), size=2.5, alpha=0.9) + 
-  scale_colour_manual(values=cols) + theme_bw() +
-  theme(legend.position="bottom") + xlab("Date of Poll") + ylab("Percent") +
-  facet_wrap(~variable) 
+lastPoll <- sprintf("Last Poll on %s", max(mdems$endDate))
+
+    cols <- c(brewer.pal(12, name="Paired"), "grey30")
+    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mreps, year >=2015)) +
+      geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
+      geom_point(aes(x=endDate, y=value), size=2.5) + 
+      scale_colour_manual(values=cols) + theme_bw() +
+      theme(legend.position="bottom") + xlab("Date of Poll") + ylab("Percent") +
+      facet_wrap(~variable) + ggtitle(lastPoll)
+    
+    print(p)
 
 ```
