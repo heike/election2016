@@ -52,7 +52,7 @@ mreps <- melt(reps, measure.vars=3:17, na.rm=TRUE)
 mreps <- subset(mreps, Poll != "RCP Average")
 
 
-lastPoll <- sprintf("Last Poll on %s", max(mdems$endDate))
+lastPoll <- sprintf("Last Poll on %s", max(mreps$endDate))
 
     cols <- c(brewer.pal(12, name="Paired"), "grey30")
     p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mreps, year >=2015)) +

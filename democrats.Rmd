@@ -61,6 +61,7 @@ mdems <- subset(mdems, Poll != "RCP Average")
 
  lastPoll <- sprintf("Last Poll on %s", max(mdems$endDate))
     cols <- c(brewer.pal(12, name="Paired"), "grey30")
+    mdems$voterType <- factor(mdems$voterType, c("RV", "LV", "A"))
     
     p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mdems, year >=2015)) +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
@@ -68,7 +69,7 @@ mdems <- subset(mdems, Poll != "RCP Average")
       scale_colour_manual(values=cols) + theme_bw() +
       theme(legend.position="bottom") + xlab("Date of Poll") + ylab("Percent") +
       facet_wrap(~variable) +
-      scale_shape_manual("Type of Poll",values=c(4, 1, 19)) +
+      scale_shape_manual("Type of Poll",values=c(19, 1, 4)) +
       ggtitle(lastPoll)
     
    print(p)

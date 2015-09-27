@@ -41,14 +41,23 @@ plotCandidates <- function(rcp.gen) {
     endDate = mdy(paste(x[2],"15", sep="/"))))
   year(d2$startDate) <- gen$year
   year(d2$endDate) <- gen$year
-  
+
   gen <- data.frame(gen, d2)
-    demID <- grep("..D.", names(gen), fixed=TRUE)
-    repID <- grep("..R.", names(gen), fixed=TRUE)
+
+  
+  
+  demID <- grep("..D.", names(gen), fixed=TRUE)
+  repID <- grep("..R.", names(gen), fixed=TRUE)
     
   gen$value <- gen[,demID] - gen[,repID]
   democrat <- names(gen)[demID]
   republican <- names(gen)[repID]
+  democrat <- gsub("..D.","", democrat, fixed=TRUE)
+  republican <- gsub("..R.","", republican, fixed=TRUE)
+  
+  fname <- sprintf("general-%s-%s.csv",democrat, republican)
+  write.csv(gen, fname, row.names=FALSE)
+  
   yrange <- max(abs(gen$value), na.rm=TRUE) *c(-1,1)
   by <- 5
   if (max(yrange) > 10) by <- 10
@@ -70,9 +79,9 @@ plotCandidates <- function(rcp.gen) {
     scale_colour_manual(values=cols) + theme_bw() +
     theme(legend.position="bottom") + xlab("Date of Poll") + 
     annotate("text", x=max(gen$endDate), y=yrange[2], label=democrat, 
-             colour="grey50", size=7) +
+             colour="grey50", size=7, hjust=1) +
     annotate("text", x=max(gen$endDate), y=yrange[1], label=republican, 
-             colour="grey50", size=7) +
+             colour="grey50", size=7, hjust=1) +
     scale_y_continuous("Percent Difference", breaks=yscale, 
                        labels=abs(yscale), limits=yrange)
 }
