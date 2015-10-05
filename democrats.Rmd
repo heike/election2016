@@ -60,7 +60,7 @@ mdems <- subset(mdems, Poll != "RCP Average")
 
 
  lastPoll <- sprintf("Last Poll on %s", max(mdems$endDate))
-    cols <- c(brewer.pal(12, name="Paired"), "grey30")
+    cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70")
     mdems$voterType <- factor(mdems$voterType, c("RV", "LV", "A"))
     
     p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mdems, year >=2015)) +

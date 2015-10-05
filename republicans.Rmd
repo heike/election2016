@@ -54,7 +54,7 @@ mreps <- subset(mreps, Poll != "RCP Average")
 
 lastPoll <- sprintf("Last Poll on %s", max(mreps$endDate))
 
-    cols <- c(brewer.pal(12, name="Paired"), "grey30")
+    cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70")
     p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mreps, year >=2015)) +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value), size=2.5) + 
