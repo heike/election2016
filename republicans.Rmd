@@ -48,7 +48,7 @@ year(d2$endDate) <- reps$year
 reps <- data.frame(reps, d2)
 
 
-mreps <- melt(reps, measure.vars=3:17, na.rm=TRUE)
+mreps <- melt(reps, measure.vars=3:16, na.rm=TRUE)
 mreps <- subset(mreps, Poll != "RCP Average")
 
 
