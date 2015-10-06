@@ -71,6 +71,8 @@ plotCandidates <- function(rcp.gen) {
       sm_layer <- geom_smooth(aes(x=endDate, y=value, group=1), 
                               colour="grey30", se=FALSE, size=.75, data=gen) 
   }
+  lastPoll <- sprintf("Last Poll on %s", max(gen$endDate))
+
   ggplot(aes(colour=Poll), data=gen) +
     geom_hline(yintercept=0, colour="grey80") +
     sm_layer + 
@@ -83,14 +85,13 @@ plotCandidates <- function(rcp.gen) {
     annotate("text", x=max(gen$endDate), y=yrange[1], label=republican, 
              colour="grey50", size=7, hjust=1) +
     scale_y_continuous("Percent Difference", breaks=yscale, 
-                       labels=abs(yscale), limits=yrange)
+                       labels=abs(yscale), limits=yrange) +
+    ggtitle(lastPoll)
 }
 ############
 plotCandidates("http://www.realclearpolitics.com/epolls/2016/president/us/general_election_trump_vs_clinton-5491.html")
 
 plotCandidates("http://www.realclearpolitics.com/epolls/2016/president/us/general_election_fiorina_vs_clinton-5470.html")
-
-plotCandidates("http://www.realclearpolitics.com/epolls/2016/president/us/general_election_bush_vs_clinton-3827.html")
 
 plotCandidates("http://www.realclearpolitics.com/epolls/2016/president/us/general_election_bush_vs_clinton-3827.html")
 
