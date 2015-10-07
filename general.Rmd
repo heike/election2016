@@ -23,25 +23,32 @@ sub <- function(x, replace=c("--"), by=NA) {
   x
 }
 
+fixYear <- function(date) {
+  month <- month(date)
+  dm <- c(0, diff(month))
+  cdm <- cumsum(dm > 2)
+  2015 - cdm
+}
+
 plotCandidates <- function(rcp.gen) {
   tables <- readHTMLTable(rcp.gen)
   dims <- ldply(tables, function(x) if (is.null(x)) c(0,0) else dim(x))
   gen <- data.frame(tables[[which.max(dims[,2])]])
-  gen <- gen[nrow(gen):1,]
+#  gen <- gen[nrow(gen):1,]
   gen <- subset(gen, Poll != "RCP Average")
   
   genNA <- lapply(gen, sub)
   write.csv(genNA, "temp.csv", row.names=FALSE)
   gen <- read.csv("temp.csv")
-  gen$year <- 2015
   
   dates <- strsplit(as.character(gen$Date), split=" - ")
   d2 <- ldply(dates, function(x) data.frame(
     startDate = mdy(paste(x[1],"15", sep="/")),
     endDate = mdy(paste(x[2],"15", sep="/"))))
-  year(d2$startDate) <- gen$year
-  year(d2$endDate) <- gen$year
-
+  year(d2$startDate) <- fixYear(d2$startDate)
+  year(d2$endDate) <- fixYear(d2$endDate)
+  d2$year <- year(d2$endDate)
+    
   gen <- data.frame(gen, d2)
 
   

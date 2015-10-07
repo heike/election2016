@@ -21,6 +21,12 @@ sub <- function(x, replace=c("--"), by=NA) {
   x
 }
 
+fixYear <- function(date) {
+  month <- month(date)
+  dm <- c(0, diff(month))
+  cdm <- cumsum(dm > 2)
+  2015 - cdm
+}
 ###############
 # show! 
 rcp.dem <- "http://www.realclearpolitics.com/epolls/2016/president/us/2016_democratic_presidential_nomination-3824.html"
@@ -28,23 +34,21 @@ rcp.dem <- "http://www.realclearpolitics.com/epolls/2016/president/us/2016_democ
 tables <- readHTMLTable(rcp.dem)
 dems <- data.frame(tables[[6]])
 
-dems <- dems[nrow(dems):1,]
+#dems <- dems[nrow(dems):1,]
 
 demsNA <- lapply(dems, sub)
 write.csv(demsNA, "temp.csv", row.names=FALSE)
 dems <- read.csv("temp.csv")
-dems$year <- 2015
-dems$year[1] <- 2012
-dems$year[2:18] <- 2013
-dems$year[20:38] <- 2014
 
 dates <- strsplit(as.character(dems$Date), split=" - ")
 d2 <- ldply(dates, function(x) data.frame(
   startDate = mdy(paste(x[1],"15", sep="/")),
   endDate = mdy(paste(x[2],"15", sep="/"))))
-year(d2$startDate) <- dems$year
-year(d2$endDate) <- dems$year
 dems <- data.frame(dems, d2)
+
+year(dems$endDate) <- fixYear(dems$endDate)
+year(dems$startDate) <- fixYear(dems$startDate)
+dems$year <- year(dems$endDate)
 
 samples <- strsplit(as.character(dems$Sample), split=" ")
 s2 <- ldply(samples, function(x) data.frame(

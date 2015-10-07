@@ -24,29 +24,30 @@ sub <- function(x, replace=c("--"), by=NA) {
   x
 }
 
+fixYear <- function(date) {
+  month <- month(date)
+  dm <- c(0, diff(month))
+  cdm <- cumsum(dm > 2)
+  2015 - cdm
+}
 ############
 rcp.rep <- "http://www.realclearpolitics.com/epolls/2016/president/us/2016_republican_presidential_nomination-3823.html"
 tables <- readHTMLTable(rcp.rep)
 reps <- data.frame(tables[[6]])
-reps <- reps[nrow(reps):1,]
-
+#reps <- reps[nrow(reps):1,]
 repsNA <- lapply(reps, sub)
 write.csv(repsNA, "temp.csv", row.names=FALSE)
 reps <- read.csv("temp.csv")
-reps$year <- 2015
-reps$year[1] <- 2012
-reps$year[2:19] <- 2013
-reps$year[20:46] <- 2014
 
+# latest poll is first
 dates <- strsplit(as.character(reps$Date), split=" - ")
 d2 <- ldply(dates, function(x) data.frame(
   startDate = mdy(paste(x[1],"15", sep="/")),
   endDate = mdy(paste(x[2],"15", sep="/"))))
-year(d2$startDate) <- reps$year
-year(d2$endDate) <- reps$year
-
 reps <- data.frame(reps, d2)
-
+year(reps$endDate) <- fixYear(reps$endDate)
+year(reps$startDate) <- fixYear(reps$startDate)
+reps$year <- year(reps$endDate)
 
 mreps <- melt(reps, measure.vars=3:16, na.rm=TRUE)
 mreps <- subset(mreps, Poll != "RCP Average")
