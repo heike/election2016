@@ -32,7 +32,7 @@ fixYear <- function(date) {
 rcp.dem <- "http://www.realclearpolitics.com/epolls/2016/president/us/2016_democratic_presidential_nomination-3824.html"
 
 tables <- readHTMLTable(rcp.dem)
-dems <- data.frame(tables[[6]])
+dems <- data.frame(tables[[4]])
 
 #dems <- dems[nrow(dems):1,]
 
