@@ -60,7 +60,7 @@ dems <- data.frame(dems, s2)
 idx <- which(nchar(levels(dems$Poll)) %% 2 == 0)
 
 
-mdems <- melt(dems, measure.vars=4:9, na.rm=TRUE)
+mdems <- melt(dems, measure.vars=5:7, na.rm=TRUE)
 mdems <- subset(mdems, Poll != "RCP Average")
 
 
