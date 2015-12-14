@@ -10,7 +10,8 @@ Polling results in percentage points for all Republican Presidential candidates.
 ```{r, echo=FALSE, fig.width=10, fig.height=10, message=FALSE}
 library(XML)
 library(lubridate)
-library(plyr)
+library(dplyr)
+library(stringr)
 library(reshape2)
 library(ggplot2)
 library(RColorBrewer)
@@ -30,6 +31,15 @@ fixYear <- function(date) {
   cdm <- cumsum(dm > 2)
   2015 - cdm
 }
+
+fixName <- function(name) {
+  name %>% str_replace("CBS News", "CBS") %>%
+    str_replace("ABC News", "ABC") %>%
+    str_replace("NY Times", "NYT") %>%
+    str_replace("NBC News", "NBC") %>%
+    str_replace("Wall St. Jrnl", "WSJ")
+}
+
 ############
 rcp.rep <- "http://www.realclearpolitics.com/epolls/2016/president/us/2016_republican_presidential_nomination-3823.html"
 tables <- readHTMLTable(rcp.rep)
@@ -39,9 +49,10 @@ repsNA <- lapply(reps, sub)
 write.csv(repsNA, "temp.csv", row.names=FALSE)
 reps <- read.csv("temp.csv")
 
+reps$Poll <- fixName(reps$Poll)
 # latest poll is first
 dates <- strsplit(as.character(reps$Date), split=" - ")
-d2 <- ldply(dates, function(x) data.frame(
+d2 <- plyr::ldply(dates, function(x) data.frame(
   startDate = mdy(paste(x[1],"15", sep="/")),
   endDate = mdy(paste(x[2],"15", sep="/"))))
 reps <- data.frame(reps, d2)
@@ -55,7 +66,7 @@ mreps <- subset(mreps, Poll != "RCP Average")
 
 lastPoll <- sprintf("Last Poll on %s", max(mreps$endDate))
 
-    cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70")
+    cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "black")
     p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mreps, year >=2015)) +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value), size=2.5) + 

@@ -7,7 +7,8 @@ output: html_document
 ```{r, echo=FALSE, fig.width=10, fig.height=7, message=FALSE}
 library(XML)
 library(lubridate)
-library(plyr)
+library(dplyr)
+library(stringr)
 library(reshape2)
 library(ggplot2)
 library(RColorBrewer)
@@ -27,6 +28,14 @@ fixYear <- function(date) {
   cdm <- cumsum(dm > 2)
   2015 - cdm
 }
+
+fixName <- function(name) {
+  name %>% str_replace("CBS News", "CBS") %>%
+    str_replace("ABC News", "ABC") %>%
+    str_replace("NY Times", "NYT") %>%
+    str_replace("NBC News", "NBC") %>%
+    str_replace("Wall St. Jrnl", "WSJ")
+}
 ###############
 # show! 
 rcp.dem <- "http://www.realclearpolitics.com/epolls/2016/president/us/2016_democratic_presidential_nomination-3824.html"
@@ -40,8 +49,9 @@ demsNA <- lapply(dems, sub)
 write.csv(demsNA, "temp.csv", row.names=FALSE)
 dems <- read.csv("temp.csv")
 
+dems$Poll <- fixName(dems$Poll)
 dates <- strsplit(as.character(dems$Date), split=" - ")
-d2 <- ldply(dates, function(x) data.frame(
+d2 <- plyr::ldply(dates, function(x) data.frame(
   startDate = mdy(paste(x[1],"15", sep="/")),
   endDate = mdy(paste(x[2],"15", sep="/"))))
 dems <- data.frame(dems, d2)
@@ -51,7 +61,7 @@ year(dems$startDate) <- fixYear(dems$startDate)
 dems$year <- year(dems$endDate)
 
 samples <- strsplit(as.character(dems$Sample), split=" ")
-s2 <- ldply(samples, function(x) data.frame(
+s2 <- plyr::ldply(samples, function(x) data.frame(
   pollSize=suppressWarnings(as.numeric(x[1])),
   voterType=x[2]
 ))
@@ -65,7 +75,7 @@ mdems <- subset(mdems, Poll != "RCP Average")
 
 
  lastPoll <- sprintf("Last Poll on %s", max(mdems$endDate))
-    cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black")
+    cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black")
     mdems$voterType <- factor(mdems$voterType, c("RV", "LV", "A"))
     
     p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mdems, year >=2015)) +
