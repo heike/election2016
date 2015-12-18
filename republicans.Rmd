@@ -4,7 +4,7 @@ author: "Heike Hofmann"
 output: html_document
 ---
 
-Polling results in percentage points for all Republican Presidential candidates. Polls from major pollsters are shown (by color), the line is a non-parametric loess smooth to show the trend over time. Only polls since the beginning of 2015 are included.
+Polling results in percentage points for all Republican Presidential candidates. Polls from major pollsters are shown (by color), the line is a non-parametric loess smooth to show the trend over time. Only polls since the beginning of July 2015 are included.
 
 
 ```{r, echo=FALSE, fig.width=10, fig.height=10, message=FALSE}
@@ -37,7 +37,8 @@ fixName <- function(name) {
     str_replace("ABC News", "ABC") %>%
     str_replace("NY Times", "NYT") %>%
     str_replace("NBC News", "NBC") %>%
-    str_replace("Wall St. Jrnl", "WSJ")
+    str_replace("Wall St. Jrnl", "WSJ") %>% 
+    str_replace("USA Today", "USAT")
 }
 
 ############
@@ -49,7 +50,7 @@ repsNA <- lapply(reps, sub)
 write.csv(repsNA, "temp.csv", row.names=FALSE)
 reps <- read.csv("temp.csv")
 
-reps$Poll <- fixName(reps$Poll)
+reps$Poll <- fixName(fixName(reps$Poll))
 # latest poll is first
 dates <- strsplit(as.character(reps$Date), split=" - ")
 d2 <- plyr::ldply(dates, function(x) data.frame(
@@ -59,6 +60,7 @@ reps <- data.frame(reps, d2)
 year(reps$endDate) <- fixYear(reps$endDate)
 year(reps$startDate) <- fixYear(reps$startDate)
 reps$year <- year(reps$endDate)
+reps$month <- month(reps$endDate)
 
 mreps <- melt(reps, measure.vars=3:15, na.rm=TRUE)
 mreps <- subset(mreps, Poll != "RCP Average")
@@ -67,13 +69,11 @@ mreps <- subset(mreps, Poll != "RCP Average")
 lastPoll <- sprintf("Last Poll on %s", max(mreps$endDate))
 
     cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "black")
-    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mreps, year >=2015)) +
+    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mreps, year >=2015 & month >= 7)) +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value), size=2.5) + 
       scale_colour_manual(values=cols) + theme_bw() +
       theme(legend.position="bottom") + xlab("Date of Poll") + ylab("Percent") +
       facet_wrap(~variable) + ggtitle(lastPoll)
-    
-    print(p)
-
+    p
 ```
