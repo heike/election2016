@@ -34,11 +34,11 @@ fixYear <- function(date) {
 
 fixName <- function(name) {
   name %>% str_replace("CBS News", "CBS") %>%
-    str_replace("ABC News", "ABC") %>%
-    str_replace("NY Times", "NYT") %>%
-    str_replace("NBC News", "NBC") %>%
-    str_replace("Wall St. Jrnl", "WSJ") %>% 
-    str_replace("USA Today", "USAT")
+    str_replace_all("ABC News", "ABC") %>%
+    str_replace_all("NY Times", "NYT") %>%
+    str_replace_all("NBC News", "NBC") %>%
+    str_replace_all("Wall St. Jrnl", "WSJ") %>% 
+    str_replace_all("USA Today", "USAT")
 }
 
 ############
@@ -50,7 +50,7 @@ repsNA <- lapply(reps, sub)
 write.csv(repsNA, "temp.csv", row.names=FALSE)
 reps <- read.csv("temp.csv")
 
-reps$Poll <- fixName(fixName(reps$Poll))
+reps$Poll <- fixName(reps$Poll)
 # latest poll is first
 dates <- strsplit(as.character(reps$Date), split=" - ")
 d2 <- plyr::ldply(dates, function(x) data.frame(

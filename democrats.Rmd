@@ -30,11 +30,11 @@ fixYear <- function(date) {
 }
 
 fixName <- function(name) {
-  name %>% str_replace("CBS News", "CBS") %>%
-    str_replace("ABC News", "ABC") %>%
-    str_replace("NY Times", "NYT") %>%
-    str_replace("NBC News", "NBC") %>%
-    str_replace("Wall St. Jrnl", "WSJ")
+  name %>% str_replace_all("CBS News", "CBS") %>%
+    str_replace_all("ABC News", "ABC") %>%
+    str_replace_all("NY Times", "NYT") %>%
+    str_replace_all("NBC News", "NBC") %>%
+    str_replace_all("Wall St. Jrnl", "WSJ")
 }
 ###############
 # show! 
@@ -59,6 +59,7 @@ dems <- data.frame(dems, d2)
 year(dems$endDate) <- fixYear(dems$endDate)
 year(dems$startDate) <- fixYear(dems$startDate)
 dems$year <- year(dems$endDate)
+dems$month <- month(dems$endDate)
 
 samples <- strsplit(as.character(dems$Sample), split=" ")
 s2 <- plyr::ldply(samples, function(x) data.frame(
@@ -78,7 +79,7 @@ mdems <- subset(mdems, Poll != "RCP Average")
     cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black")
     mdems$voterType <- factor(mdems$voterType, c("RV", "LV", "A"))
     
-    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mdems, year >=2015)) +
+    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mdems, year >=2015 & month >=7)) +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value, shape=voterType), size=2.5) + 
       scale_colour_manual(values=cols) + theme_bw() +
