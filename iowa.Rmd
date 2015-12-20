@@ -1,0 +1,142 @@
+---
+title: "Presidential Candidates in Iowa"
+author: "Heike Hofmann"
+output: html_document
+---
+
+```{r, echo=FALSE, fig.width=10, fig.height=10, message=FALSE}
+library(XML)
+library(lubridate)
+library(dplyr)
+library(stringr)
+library(reshape2)
+library(ggplot2)
+library(RColorBrewer)
+
+###############
+#  functions
+sub <- function(x, replace=c("--"), by=NA) {
+  x <- as.character(x)
+  idx <- which(x %in% replace)
+  if (length(idx) > 0) x[idx] <- by
+  x
+}
+
+fixYear <- function(date) {
+  month <- month(date)
+  dm <- c(0, diff(month))
+  cdm <- cumsum(dm > 2)
+  2015 - cdm
+}
+
+fixName <- function(name) {
+  name %>% str_replace_all("CBS News", "CBS") %>%
+    str_replace_all("ABC News", "ABC") %>%
+    str_replace_all("NY Times", "NYT") %>%
+    str_replace_all("NBC News", "NBC") %>%
+    str_replace_all("Wall St. Jrnl", "WSJ")
+}
+###############
+# show! 
+rcp.gop <- "http://www.realclearpolitics.com/epolls/2016/president/ia/iowa_republican_presidential_caucus-3194.html"
+
+tables <- readHTMLTable(rcp.gop)
+polls <- data.frame(tables[[4]])
+
+pollsNA <- lapply(polls, sub)
+write.csv(pollsNA, "temp.csv", row.names=FALSE)
+polls <- read.csv("temp.csv")
+
+polls$Poll <- fixName(polls$Poll)
+dates <- strsplit(as.character(polls$Date), split=" - ")
+d2 <- plyr::ldply(dates, function(x) data.frame(
+  startDate = mdy(paste(x[1],"15", sep="/")),
+  endDate = mdy(paste(x[2],"15", sep="/"))))
+polls <- data.frame(polls, d2)
+
+year(polls$endDate) <- fixYear(polls$endDate)
+year(polls$startDate) <- fixYear(polls$startDate)
+polls$year <- year(polls$endDate)
+polls$month <- month(polls$endDate)
+
+samples <- strsplit(as.character(polls$Sample), split=" ")
+s2 <- plyr::ldply(samples, function(x) data.frame(
+  pollSize=suppressWarnings(as.numeric(x[1])),
+  voterType=x[2]
+))
+#s2$voterType[is.na(s2$voterType)] <- polls$Sample[is.na(s2$voterType)]
+#polls <- data.frame(polls, s2)
+idx <- which(nchar(levels(polls$Poll)) %% 2 == 0)
+
+
+mpolls <- melt(polls, measure.vars=3:15, na.rm=TRUE)
+mpolls <- subset(mpolls, Poll != "RCP Average")
+
+
+ lastPoll <- sprintf("Last Poll on %s", max(mpolls$endDate))
+    cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black")
+#    mpolls$voterType <- factor(mpolls$voterType, c("RV", "LV", "A"))
+    
+    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, year >=2015 & month >=7)) +
+      geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
+      geom_point(aes(x=endDate, y=value), size=2.5) + 
+      scale_colour_manual(values=cols) + theme_bw() +
+      theme(legend.position="bottom") + xlab("Date of Poll") + ylab("Percent") +
+      facet_wrap(~variable) +
+  #    scale_shape_manual("Type of Poll",values=c(19, 1, 4)) +
+      ggtitle(lastPoll)
+    
+   print(p)
+```
+
+```{r, echo=FALSE, fig.width=7.5, fig.height=4}
+rcp.dem <- "http://www.realclearpolitics.com/epolls/2016/president/ia/iowa_democratic_presidential_caucus-3195.html#polls"
+
+tables <- readHTMLTable(rcp.dem)
+polls <- data.frame(tables[[4]])
+
+pollsNA <- lapply(polls, sub)
+write.csv(pollsNA, "temp.csv", row.names=FALSE)
+polls <- read.csv("temp.csv")
+
+polls$Poll <- fixName(polls$Poll)
+dates <- strsplit(as.character(polls$Date), split=" - ")
+d2 <- plyr::ldply(dates, function(x) data.frame(
+  startDate = mdy(paste(x[1],"15", sep="/")),
+  endDate = mdy(paste(x[2],"15", sep="/"))))
+polls <- data.frame(polls, d2)
+
+year(polls$endDate) <- fixYear(polls$endDate)
+year(polls$startDate) <- fixYear(polls$startDate)
+polls$year <- year(polls$endDate)
+polls$month <- month(polls$endDate)
+
+samples <- strsplit(as.character(polls$Sample), split=" ")
+s2 <- plyr::ldply(samples, function(x) data.frame(
+  pollSize=suppressWarnings(as.numeric(x[1])),
+  voterType=x[2]
+))
+s2$voterType[is.na(s2$voterType)] <- polls$Sample[is.na(s2$voterType)]
+polls <- data.frame(polls, s2)
+idx <- which(nchar(levels(polls$Poll)) %% 2 == 0)
+
+
+mpolls <- melt(polls, measure.vars=5:7, na.rm=TRUE)
+mpolls <- subset(mpolls, Poll != "RCP Average")
+
+
+ lastPoll <- sprintf("Last Poll on %s", max(mpolls$endDate))
+    cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black")
+    mpolls$voterType <- factor(mpolls$voterType, c("LV", "RV", "A"))
+    
+    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, year >=2015 & month >=7)) +
+      geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
+      geom_point(aes(x=endDate, y=value, shape=voterType), size=2.5) + 
+      scale_colour_manual(values=cols) + theme_bw() +
+      theme(legend.position="bottom") + xlab("Date of Poll") + ylab("Percent") +
+      facet_wrap(~variable) +
+      scale_shape_manual("Type of Poll",values=c(19, 1, 4)) +
+      ggtitle(lastPoll)
+    
+   print(p)
+```
