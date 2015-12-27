@@ -4,7 +4,7 @@ author: "Heike Hofmann"
 output: html_document
 ---
 
-```{r, echo=FALSE, fig.width=10, fig.height=10, message=FALSE}
+```{r, echo=FALSE, fig.width=10, fig.height=10, message=FALSE, warning = FALSE}
 library(XML)
 library(lubridate)
 library(dplyr)
@@ -70,7 +70,7 @@ s2 <- plyr::ldply(samples, function(x) data.frame(
 idx <- which(nchar(levels(polls$Poll)) %% 2 == 0)
 
 
-mpolls <- melt(polls, measure.vars=3:15, na.rm=TRUE)
+mpolls <- melt(polls, measure.vars=3:14, na.rm=TRUE)
 mpolls <- subset(mpolls, Poll != "RCP Average")
 
 

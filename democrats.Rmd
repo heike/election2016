@@ -4,7 +4,7 @@ author: "Heike Hofmann"
 output: html_document
 ---
 
-```{r, echo=FALSE, fig.width=10, fig.height=7, message=FALSE}
+```{r, echo=FALSE, fig.width=10, fig.height=6, message=FALSE, warning=FALSE}
 library(XML)
 library(lubridate)
 library(dplyr)

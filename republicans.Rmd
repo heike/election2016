@@ -7,7 +7,7 @@ output: html_document
 Polling results in percentage points for all Republican Presidential candidates. Polls from major pollsters are shown (by color), the line is a non-parametric loess smooth to show the trend over time. Only polls since the beginning of July 2015 are included.
 
 
-```{r, echo=FALSE, fig.width=10, fig.height=10, message=FALSE}
+```{r, echo=FALSE, fig.width=10, fig.height=10, message=FALSE, warning=FALSE}
 library(XML)
 library(lubridate)
 library(dplyr)
