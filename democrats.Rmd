@@ -26,7 +26,7 @@ fixYear <- function(date) {
   month <- month(date)
   dm <- c(0, diff(month))
   cdm <- cumsum(dm > 2)
-  2015 - cdm
+  2016 - cdm
 }
 
 fixName <- function(name) {
@@ -79,7 +79,7 @@ mdems <- subset(mdems, Poll != "RCP Average")
     cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black")
     mdems$voterType <- factor(mdems$voterType, c("RV", "LV", "A"))
     
-    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mdems, year >=2015 & month >=7)) +
+    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mdems, (year >=2015 & month >=7) | (year >=2016))) +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value, shape=voterType), size=2.5) + 
       scale_colour_manual(values=cols) + theme_bw() +

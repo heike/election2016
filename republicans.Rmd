@@ -29,7 +29,7 @@ fixYear <- function(date) {
   month <- month(date)
   dm <- c(0, diff(month))
   cdm <- cumsum(dm > 2)
-  2015 - cdm
+  2016 - cdm
 }
 
 fixName <- function(name) {
