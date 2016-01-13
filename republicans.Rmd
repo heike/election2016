@@ -62,7 +62,7 @@ year(reps$startDate) <- fixYear(reps$startDate)
 reps$year <- year(reps$endDate)
 reps$month <- month(reps$endDate)
 
-mreps <- melt(reps, measure.vars=3:15, na.rm=TRUE)
+mreps <- melt(reps, measure.vars=4:14, na.rm=TRUE)
 mreps <- subset(mreps, Poll != "RCP Average")
 
 
