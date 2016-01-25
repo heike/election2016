@@ -35,7 +35,8 @@ fixName <- function(name) {
     str_replace_all("NY Times", "NYT") %>%
     str_replace_all("NBC News", "NBC") %>%
     str_replace_all("Wall St. Jrnl", "WSJ") %>%
-    str_replace_all("Des Moines", "DM")
+    str_replace_all("Des Moines", "DM") %>% 
+    str_replace_all("DM Register", "DMR")
 }
 ###############
 # show! 
