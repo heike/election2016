@@ -90,7 +90,7 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
    print(p)
 ```
 
-```{r, echo=FALSE, fig.width=7.5, fig.height=4}
+```{r, echo=FALSE, fig.width=7.5, fig.height=5}
 rcp.dem <- "http://www.realclearpolitics.com/epolls/2016/president/nh/new_hampshire_democratic_presidential_primary-3351.html#polls"
 
 tables <- readHTMLTable(rcp.dem)
