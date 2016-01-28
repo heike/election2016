@@ -30,6 +30,7 @@ fixYear <- function(date) {
 }
 
 fixName <- function(name) {
+  name <- gsub("*","",name, fixed=TRUE)
   name %>% str_replace_all("CBS News", "CBS") %>%
     str_replace_all("ABC News", "ABC") %>%
     str_replace_all("NY Times", "NYT") %>%
@@ -75,7 +76,7 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
 
 
  lastPoll <- sprintf("Last Poll on %s", max(mpolls$endDate))
-    cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black")
+    cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black", "black")
 #    mpolls$voterType <- factor(mpolls$voterType, c("RV", "LV", "A"))
     
     p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year >=2015 & month >=7) | (year >= 2016))) +
