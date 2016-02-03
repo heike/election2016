@@ -52,9 +52,11 @@ polls <- read.csv("temp.csv")
 polls$Poll <- fixName(polls$Poll)
 dates <- strsplit(as.character(polls$Date), split=" - ")
 d2 <- plyr::ldply(dates, function(x) data.frame(
-  startDate = mdy(paste(x[1],"15", sep="/")),
-  endDate = mdy(paste(x[2],"15", sep="/"))))
+  startDate = mdy(paste(x[1],"16", sep="/")),
+  endDate = mdy(paste(x[2],"16", sep="/"))))
 polls <- data.frame(polls, d2)
+
+polls[1,]$endDate <- as.Date("2016/02/01")
 
 year(polls$endDate) <- fixYear(polls$endDate)
 year(polls$startDate) <- fixYear(polls$startDate)
@@ -79,14 +81,15 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
     cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black")
 #    mpolls$voterType <- factor(mpolls$voterType, c("RV", "LV", "A"))
     
-    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year >=2015 & month >=7) | (year == 2016))) +
+    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (Poll != "Final Results") & (year >=2015 & month >=7) | (year == 2016))) +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value), size=2.5) + 
       scale_colour_manual(values=cols) + theme_bw() +
       theme(legend.position="bottom") + xlab("Date of Poll") + ylab("Percent") +
       facet_wrap(~variable) +
   #    scale_shape_manual("Type of Poll",values=c(19, 1, 4)) +
-      ggtitle(lastPoll)
+      ggtitle(lastPoll) + 
+      geom_point(aes(x=endDate, y=value), pch=1, size=4, data=subset(mpolls, Poll=="Final Results"))
     
    print(p)
 ```
@@ -108,6 +111,7 @@ d2 <- plyr::ldply(dates, function(x) data.frame(
   endDate = mdy(paste(x[2],"15", sep="/"))))
 polls <- data.frame(polls, d2)
 
+polls[1,]$endDate <- as.Date("2016/02/01")
 year(polls$endDate) <- fixYear(polls$endDate)
 year(polls$startDate) <- fixYear(polls$startDate)
 polls$year <- year(polls$endDate)
@@ -128,7 +132,7 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
 
 
  lastPoll <- sprintf("Last Poll on %s", max(mpolls$endDate))
-    cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black")
+    cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black", "black")
     mpolls$voterType <- factor(mpolls$voterType, c("LV", "RV", "A"))
     
     p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year >=2015 & month >=7) | (year == 2016))) +
@@ -138,7 +142,8 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
       theme(legend.position="bottom") + xlab("Date of Poll") + ylab("Percent") +
       facet_wrap(~variable) +
       scale_shape_manual("Type of Poll",values=c(19, 1, 4)) +
-      ggtitle(lastPoll)
+      ggtitle(lastPoll) + 
+      geom_point(data=subset(mpolls,Poll=="Final Results"), pch=1, size=4)
     
    print(p)
 ```
