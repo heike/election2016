@@ -13,6 +13,16 @@ library(reshape2)
 library(ggplot2)
 library(RColorBrewer)
 
+caucus <- data.frame(State=c("IA"), Date=ymd(c("2016/02/01")))
+
+caucuslayer <- function(ymax) {
+  list(
+  annotate("segment", x=caucus$Date, xend=caucus$Date, y = 2, yend=ymax,
+               colour="grey75"),
+  annotate("text", x=caucus$Date, y = 0, label=caucus$State,
+               colour="grey75", size=4)
+)
+}
 ###############
 #  functions
 sub <- function(x, replace=c("--"), by=NA) {
@@ -81,6 +91,7 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
 #    mpolls$voterType <- factor(mpolls$voterType, c("RV", "LV", "A"))
     
     p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year >=2015 & month >=7) | (year >= 2016))) +
+      caucuslayer(max(mpolls$value)) +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value), size=2.5) + 
       scale_colour_manual(values=cols) + theme_bw() +
@@ -105,8 +116,8 @@ polls <- read.csv("temp.csv")
 polls$Poll <- fixName(polls$Poll)
 dates <- strsplit(as.character(polls$Date), split=" - ")
 d2 <- plyr::ldply(dates, function(x) data.frame(
-  startDate = mdy(paste(x[1],"15", sep="/")),
-  endDate = mdy(paste(x[2],"15", sep="/"))))
+  startDate = mdy(paste(x[1],"16", sep="/")),
+  endDate = mdy(paste(x[2],"16", sep="/"))))
 polls <- data.frame(polls, d2)
 
 year(polls$endDate) <- fixYear(polls$endDate)
@@ -132,7 +143,8 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
     cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black")
     mpolls$voterType <- factor(mpolls$voterType, c("LV", "RV", "A"))
     
-    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, year >=2015 & month >=7)) +
+    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year==2016) | (year >=2015 & month >=7))) +
+      caucuslayer(max(mpolls$value)) +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value, shape=voterType), size=2.5) + 
       scale_colour_manual(values=cols) + theme_bw() +
