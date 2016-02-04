@@ -4,7 +4,7 @@ author: "Heike Hofmann"
 output: html_document
 ---
 
-```{r, echo=FALSE, fig.width=10, fig.height=10, message=FALSE, warning = FALSE}
+```{r, echo=FALSE, fig.width=12, fig.height=10, message=FALSE, warning = FALSE}
 library(XML)
 library(lubridate)
 library(dplyr)
@@ -13,14 +13,19 @@ library(reshape2)
 library(ggplot2)
 library(RColorBrewer)
 
-caucus <- data.frame(State=c("IA"), Date=ymd(c("2016/02/01")))
+caucus <- data.frame(
+  State=c("IA", "IA", "NH", "NH"), 
+  Date=ymd(c("2016/02/01", "2016/02/01", "2016/02/09", "2016/02/09")),
+  Party=c("R","D", "R","D")
+  )
 
-caucuslayer <- function(ymax) {
+caucuslayer <- function(ymax, party) {
+  subcaucus <- subset(caucus, Party=party)
   list(
-  annotate("segment", x=caucus$Date, xend=caucus$Date, y = 2, yend=ymax,
-               colour="grey75"),
-  annotate("text", x=caucus$Date, y = 0, label=caucus$State,
-               colour="grey75", size=4)
+  geom_segment(aes(x=Date, xend=Date), y = 2, yend=ymax,
+               colour="grey75", data=subcaucus),
+  geom_text(aes(x=Date,  label=State), y = 0, size=2.25,
+               colour="grey75", data=subcaucus)
 )
 }
 ###############
@@ -91,7 +96,7 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
 #    mpolls$voterType <- factor(mpolls$voterType, c("RV", "LV", "A"))
     
     p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year >=2015 & month >=7) | (year >= 2016))) +
-      caucuslayer(max(mpolls$value)) +
+      caucuslayer(max(mpolls$value), "R") +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value), size=2.5) + 
       scale_colour_manual(values=cols) + theme_bw() +
