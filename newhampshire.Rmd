@@ -82,7 +82,7 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
     cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black", "black", "black", "black")
 #    mpolls$voterType <- factor(mpolls$voterType, c("RV", "LV", "A"))
     
-    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year >=2015 & month >=11) | (year >= 2016))) +
+    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls,  (year >= 2016))) +
       caucuslayer(max(mpolls$value), "R") +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value), size=2.5) + 
@@ -96,7 +96,7 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
    print(p)
 ```
 
-```{r, echo=FALSE, fig.width=7.5, fig.height=5}
+```{r, echo=FALSE, fig.width=7.5, fig.height=5, message=FALSE, warning=FALSE}
 rcp.dem <- "http://www.realclearpolitics.com/epolls/2016/president/nh/new_hampshire_democratic_presidential_primary-3351.html#polls"
 
 tables <- readHTMLTable(rcp.dem)
@@ -136,7 +136,7 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
     cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black")
     mpolls$voterType <- factor(mpolls$voterType, c("LV", "RV", "A"))
     
-    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year==2016) | (year >=2015 & month >=11))) +
+    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year==2016))) +
       caucuslayer(max(mpolls$value)) +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value, shape=voterType), size=2.5) + 
