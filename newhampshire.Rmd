@@ -33,14 +33,19 @@ fixYear <- function(date) {
 fixName <- function(name) {
   name <- gsub("*","",name, fixed=TRUE)
   name <- gsub(" (Tracking)", "", name, fixed=TRUE)
+  name <- gsub("Mrng.", "Morning", name, fixed=TRUE)
   name <- name %>% str_replace_all("CBS News", "CBS") %>%
     str_replace_all("ABC News", "ABC") %>%
     str_replace_all("NY Times", "NYT") %>%
     str_replace_all("NBC News", "NBC") %>%
     str_replace_all("Wall St. Jrnl", "WSJ") %>%
     str_replace_all("Gravis Marketing", "Gravis") %>%
-    str_replace_all("Suffolk University", "Suffolk") 
-  gsub("([A-Z][A-Z a-z]*)(.*)\\1", "\\1\\2", name)
+    str_replace_all("Suffolk University", "Suffolk")
+    
+  name <- gsub("([A-Z][A-Z a-z()0-9]+)(.*)\\1", "\\1\\2", name)
+  name <- gsub("([A-Z][A-Z a-z()0-9]+)(.*)\\1", "\\1\\2", name)
+  splits <- strsplit(name, split="/") 
+  sapply(splits, function(x) paste(unique(x),sep="/", collapse="/"))
 }
 ###############
 # show! 
