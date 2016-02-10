@@ -91,7 +91,7 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
 #    mpolls$voterType <- factor(mpolls$voterType, c("RV", "LV", "A"))
     
     p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls,  (year >= 2016))) +
-      caucuslayer(max(mpolls$value), "R") +
+      caucuslayer(max(mpolls$value), party="R") +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value), size=2.5) + 
 #      geom_segment(aes(x=endDate, xend=endDate, y=value-MoE, yend=value+MoE)) +
@@ -145,7 +145,7 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
     mpolls$voterType <- factor(mpolls$voterType, c("LV", "RV", "A"))
     
     p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year==2016))) +
-      caucuslayer(max(mpolls$value)) +
+      caucuslayer(max(mpolls$value), party="D") +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value, shape=voterType), size=2.5) + 
  #     geom_segment(aes(x=endDate, xend=endDate, y=value-MoE, yend=value+MoE)) +
