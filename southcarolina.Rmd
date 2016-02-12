@@ -16,30 +16,7 @@ library(RColorBrewer)
 source("caucus.R")
 ###############
 #  functions
-sub <- function(x, replace=c("--"), by=NA) {
-  x <- as.character(x)
-  idx <- which(x %in% replace)
-  if (length(idx) > 0) x[idx] <- by
-  x
-}
-
-fixYear <- function(date) {
-  month <- month(date)
-  dm <- c(0, diff(month))
-  cdm <- cumsum(dm > 2)
-  2016 - cdm
-}
-
-fixName <- function(name) {
-  name <- gsub("*","",name, fixed=TRUE)
-  name %>% str_replace_all("CBS News", "CBS") %>%
-    str_replace_all("ABC News", "ABC") %>%
-    str_replace_all("NY Times", "NYT") %>%
-    str_replace_all("NBC News", "NBC") %>%
-    str_replace_all("Wall St. Jrnl", "WSJ") %>%
-    str_replace_all("Gravis Marketing", "Gravis") %>%
-    str_replace_all("Suffolk University", "Suffolk")
-}
+source("functions.R")
 ###############
 # show! 
 rcp.gop <- "http://www.realclearpolitics.com/epolls/2016/president/sc/south_carolina_republican_presidential_primary-4151.html"

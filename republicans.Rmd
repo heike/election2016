@@ -4,7 +4,7 @@ author: "Heike Hofmann"
 output: html_document
 ---
 
-Polling results in percentage points for all Republican Presidential candidates. Polls from major pollsters are shown (by color), the line is a non-parametric loess smooth to show the trend over time. Only polls since the beginning of July 2015 are included.
+Polling results in percentage points for all Republican Presidential candidates. Polls from major pollsters are shown (by color), the line is a non-parametric loess smooth to show the trend over time. Only polls since the end of 2015 are included.
 
 
 ```{r, echo=FALSE, fig.width=10, fig.height=10, message=FALSE, warning=FALSE}
@@ -16,30 +16,10 @@ library(reshape2)
 library(ggplot2)
 library(RColorBrewer)
 
+source("caucus.R")
 ###############
 #  functions
-sub <- function(x, replace=c("--"), by=NA) {
-  x <- as.character(x)
-  idx <- which(x %in% replace)
-  if (length(idx) > 0) x[idx] <- by
-  x
-}
-
-fixYear <- function(date) {
-  month <- month(date)
-  dm <- c(0, diff(month))
-  cdm <- cumsum(dm > 2)
-  2016 - cdm
-}
-
-fixName <- function(name) {
-  name %>% str_replace("CBS News", "CBS") %>%
-    str_replace_all("ABC News", "ABC") %>%
-    str_replace_all("NY Times", "NYT") %>%
-    str_replace_all("NBC News", "NBC") %>%
-    str_replace_all("Wall St. Jrnl", "WSJ") %>% 
-    str_replace_all("USA Today", "USAT")
-}
+source("functions.R")
 
 ############
 rcp.rep <- "http://www.realclearpolitics.com/epolls/2016/president/us/2016_republican_presidential_nomination-3823.html"
@@ -62,14 +42,15 @@ year(reps$startDate) <- fixYear(reps$startDate)
 reps$year <- year(reps$endDate)
 reps$month <- month(reps$endDate)
 
-mreps <- melt(reps, measure.vars=4:14, na.rm=TRUE)
+mreps <- melt(reps, measure.vars=4:11, na.rm=TRUE)
 mreps <- subset(mreps, Poll != "RCP Average")
 
 
 lastPoll <- sprintf("Last Poll on %s", max(mreps$endDate))
 
     cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "black")
-    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mreps, year >=2015 & month >= 7)) +
+    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mreps, (year >=2016) | (year >=2015 & month >= 11))) +
+      caucuslayer(max(mreps$value), "R") +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value), size=2.5) + 
       scale_colour_manual(values=cols) + theme_bw() +
