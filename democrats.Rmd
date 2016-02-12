@@ -13,29 +13,11 @@ library(reshape2)
 library(ggplot2)
 library(RColorBrewer)
 
+source("caucus.R")
+
 ###############
 #  functions
-sub <- function(x, replace=c("--"), by=NA) {
-  x <- as.character(x)
-  idx <- which(x %in% replace)
-  if (length(idx) > 0) x[idx] <- by
-  x
-}
-
-fixYear <- function(date) {
-  month <- month(date)
-  dm <- c(0, diff(month))
-  cdm <- cumsum(dm > 2)
-  2016 - cdm
-}
-
-fixName <- function(name) {
-  name %>% str_replace_all("CBS News", "CBS") %>%
-    str_replace_all("ABC News", "ABC") %>%
-    str_replace_all("NY Times", "NYT") %>%
-    str_replace_all("NBC News", "NBC") %>%
-    str_replace_all("Wall St. Jrnl", "WSJ")
-}
+source("functions.R")
 ###############
 # show! 
 rcp.dem <- "http://www.realclearpolitics.com/epolls/2016/president/us/2016_democratic_presidential_nomination-3824.html"
@@ -71,7 +53,7 @@ dems <- data.frame(dems, s2)
 idx <- which(nchar(levels(dems$Poll)) %% 2 == 0)
 
 
-mdems <- melt(dems, measure.vars=5:7, na.rm=TRUE)
+mdems <- melt(dems, measure.vars=5:6, na.rm=TRUE)
 mdems <- subset(mdems, Poll != "RCP Average")
 
 
@@ -79,7 +61,8 @@ mdems <- subset(mdems, Poll != "RCP Average")
     cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black")
     mdems$voterType <- factor(mdems$voterType, c("RV", "LV", "A"))
     
-    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mdems, (year >=2015 & month >=7) | (year >=2016))) +
+    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mdems, (year >=2015 & month >=11) | (year >=2016))) +
+      caucuslayer(max(mdems$value), "D") +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value, shape=voterType), size=2.5) + 
       scale_colour_manual(values=cols) + theme_bw() +
