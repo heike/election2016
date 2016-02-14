@@ -50,7 +50,7 @@ s2 <- plyr::ldply(samples, function(x) data.frame(
 idx <- which(nchar(levels(polls$Poll)) %% 2 == 0)
 
 
-mpolls <- melt(polls, measure.vars=4:14, na.rm=TRUE)
+mpolls <- melt(polls, measure.vars=5:10, na.rm=TRUE)
 mpolls <- subset(mpolls, Poll != "RCP Average")
 
 
