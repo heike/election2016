@@ -103,7 +103,7 @@ polls <- data.frame(polls, s2)
 idx <- which(nchar(levels(polls$Poll)) %% 2 == 0)
 
 
-mpolls <- melt(polls, measure.vars=5:7, na.rm=TRUE)
+mpolls <- melt(polls, measure.vars=5:6, na.rm=TRUE)
 mpolls <- subset(mpolls, Poll != "RCP Average")
 
 
