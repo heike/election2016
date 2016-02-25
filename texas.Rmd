@@ -1,0 +1,126 @@
+---
+title: "Presidential Candidates in Texas"
+author: "Heike Hofmann"
+output: html_document
+---
+
+```{r, echo=FALSE, fig.width=10, fig.height=10, message=FALSE, warning = FALSE}
+library(XML)
+library(lubridate)
+library(dplyr)
+library(stringr)
+library(reshape2)
+library(ggplot2)
+library(RColorBrewer)
+
+source("caucus.R")
+###############
+#  functions
+source("functions.R")
+###############
+# show! 
+rcp.gop <- "http://www.realclearpolitics.com/epolls/2016/president/tx/texas_republican_presidential_primary-3622.html"
+
+tables <- readHTMLTable(rcp.gop)
+polls <- data.frame(tables[[4]])
+
+pollsNA <- lapply(polls, sub)
+write.csv(pollsNA, "temp.csv", row.names=FALSE)
+polls <- read.csv("temp.csv")
+
+polls$Poll <- fixName(polls$Poll)
+dates <- strsplit(as.character(polls$Date), split=" - ")
+d2 <- plyr::ldply(dates, function(x) data.frame(
+  startDate = mdy(paste(x[1],"15", sep="/")),
+  endDate = mdy(paste(x[2],"15", sep="/"))))
+polls <- data.frame(polls, d2)
+
+
+year(polls$endDate) <- fixYear(polls$endDate)
+year(polls$startDate) <- fixYear(polls$startDate)
+polls$year <- year(polls$endDate)
+polls$month <- month(polls$endDate)
+
+samples <- strsplit(as.character(polls$Sample), split=" ")
+s2 <- plyr::ldply(samples, function(x) data.frame(
+  pollSize=suppressWarnings(as.numeric(x[1])),
+  voterType=x[2]
+))
+#s2$voterType[is.na(s2$voterType)] <- polls$Sample[is.na(s2$voterType)]
+#polls <- data.frame(polls, s2)
+idx <- which(nchar(levels(polls$Poll)) %% 2 == 0)
+
+
+mpolls <- melt(polls, measure.vars=5:9, na.rm=TRUE)
+mpolls <- subset(mpolls, Poll != "RCP Average")
+
+
+ lastPoll <- sprintf("Last Poll on %s", max(mpolls$endDate))
+    cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black", "black", "black", "black")
+#    mpolls$voterType <- factor(mpolls$voterType, c("RV", "LV", "A"))
+    
+    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year >= 2016))) +
+      caucuslayer(max(mpolls$value), party="R") +
+      geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
+      geom_point(aes(x=endDate, y=value), size=2.5) + 
+      scale_colour_manual(values=cols) + theme_bw() +
+      theme(legend.position="bottom") + xlab("Date of Poll") + ylab("Percent") +
+      facet_wrap(~variable) +
+      ggtitle(lastPoll)  
+##      geom_point(aes(x=endDate, y=value), pch=1, size=4, data=subset(mpolls, Poll=="Final Results"))
+    
+   print(p)
+```
+
+```{r, echo=FALSE, fig.width=7.5, fig.height=5}
+rcp.dem <- "http://www.realclearpolitics.com/epolls/2016/president/tx/texas_democratic_presidential_primary-4158.html"
+
+tables <- readHTMLTable(rcp.dem)
+polls <- data.frame(tables[[2]])
+
+pollsNA <- lapply(polls, sub)
+write.csv(pollsNA, "temp.csv", row.names=FALSE)
+polls <- read.csv("temp.csv")
+
+polls$Poll <- fixName(polls$Poll)
+dates <- strsplit(as.character(polls$Date), split=" - ")
+d2 <- plyr::ldply(dates, function(x) data.frame(
+  startDate = mdy(paste(x[1],"16", sep="/")),
+  endDate = mdy(paste(x[2],"16", sep="/"))))
+polls <- data.frame(polls, d2)
+
+year(polls$endDate) <- fixYear(polls$endDate)
+year(polls$startDate) <- fixYear(polls$startDate)
+polls$year <- year(polls$endDate)
+polls$month <- month(polls$endDate)
+
+samples <- strsplit(as.character(polls$Sample), split=" ")
+s2 <- plyr::ldply(samples, function(x) data.frame(
+  pollSize=suppressWarnings(as.numeric(x[1])),
+  voterType=x[2]
+))
+s2$voterType[is.na(s2$voterType)] <- polls$Sample[is.na(s2$voterType)]
+polls <- data.frame(polls, s2)
+idx <- which(nchar(levels(polls$Poll)) %% 2 == 0)
+
+
+mpolls <- melt(polls, measure.vars=5:6, na.rm=TRUE)
+mpolls <- subset(mpolls, Poll != "RCP Average")
+
+
+ lastPoll <- sprintf("Last Poll on %s", max(mpolls$endDate))
+    cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black")
+    mpolls$voterType <- factor(mpolls$voterType, c("LV", "RV", "A"))
+    
+    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year==2016) | (year >=2015 & month >=10))) +
+      caucuslayer(max(mpolls$value), party="D") +
+      geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
+      geom_point(aes(x=endDate, y=value, shape=voterType), size=2.5) + 
+      scale_colour_manual(values=cols) + theme_bw() +
+      theme(legend.position="bottom") + xlab("Date of Poll") + ylab("Percent") +
+      facet_wrap(~variable) +
+      scale_shape_manual("Type of Poll",values=c(19, 1, 4)) +
+      ggtitle(lastPoll)
+    
+   print(p)
+```
