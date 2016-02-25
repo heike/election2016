@@ -25,7 +25,10 @@ fixName <- function(name) {
     str_replace_all("Gravis Marketing", "Gravis") %>%
     str_replace_all("Suffolk University", "Suffolk") %>%
     str_replace_all("St. Anselm", "Saint Anselm") %>%
-    str_replace_all("UMass Lowell", "UMass")
+    str_replace_all("UMass Lowell", "UMass") %>%
+    str_replace_all("University", "U.") %>%
+    str_replace_all("SUSA", "SurveyUSA") %>%
+    str_replace_all("Texas Tribune", "TX Tribune")
   
   name <- gsub("([A-Z][A-Z a-z()0-9]+)(.*)\\1", "\\1\\2", name)
   name <- gsub("([A-Z][A-Z a-z()0-9]+)(.*)\\1", "\\1\\2", name)
