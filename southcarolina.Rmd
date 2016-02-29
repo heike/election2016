@@ -74,7 +74,7 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
    print(p)
 ```
 
-```{r, echo=FALSE, fig.width=7.5, fig.height=5}
+```{r, echo=FALSE, fig.width=7.5, fig.height=5, warning=FALSE}
 rcp.dem <- "http://www.realclearpolitics.com/epolls/2016/president/sc/south_carolina_democratic_presidential_primary-4167.html"
 
 tables <- readHTMLTable(rcp.dem)
@@ -84,12 +84,14 @@ pollsNA <- lapply(polls, sub)
 write.csv(pollsNA, "temp.csv", row.names=FALSE)
 polls <- read.csv("temp.csv")
 
+
 polls$Poll <- fixName(polls$Poll)
 dates <- strsplit(as.character(polls$Date), split=" - ")
 d2 <- plyr::ldply(dates, function(x) data.frame(
   startDate = mdy(paste(x[1],"16", sep="/")),
   endDate = mdy(paste(x[2],"16", sep="/"))))
 polls <- data.frame(polls, d2)
+polls[1,]$endDate <- as.Date("2016/02/27")
 
 year(polls$endDate) <- fixYear(polls$endDate)
 year(polls$startDate) <- fixYear(polls$startDate)
@@ -122,7 +124,9 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
       theme(legend.position="bottom") + xlab("Date of Poll") + ylab("Percent") +
       facet_wrap(~variable) +
       scale_shape_manual("Type of Poll",values=c(19, 1, 4)) +
-      ggtitle(lastPoll)
+      ggtitle(lastPoll) +
+            geom_point(aes(x=endDate, y=value), pch=1, size=4, data=subset(mpolls, Poll=="Final Results"))
+
     
    print(p)
 ```
