@@ -7,7 +7,7 @@ output: html_document
 Polling results in percentage points for all Republican Presidential candidates. Polls from major pollsters are shown (by color), the line is a non-parametric loess smooth to show the trend over time. Only polls since the beginning of 2016 are included.
 
 
-```{r, echo=FALSE, fig.width=10, fig.height=10, message=FALSE, warning=FALSE}
+```{r, echo=FALSE, fig.width=10, fig.height=7.5, message=FALSE, warning=FALSE}
 library(XML)
 library(lubridate)
 library(dplyr)
@@ -42,7 +42,7 @@ year(reps$startDate) <- fixYear(reps$startDate)
 reps$year <- year(reps$endDate)
 reps$month <- month(reps$endDate)
 
-mreps <- melt(reps, measure.vars=4:9, na.rm=TRUE)
+mreps <- melt(reps, measure.vars=4:8, na.rm=TRUE)
 mreps <- subset(mreps, Poll != "RCP Average")
 
 
