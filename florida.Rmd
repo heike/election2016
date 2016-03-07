@@ -51,7 +51,7 @@ s2 <- plyr::ldply(samples, function(x) data.frame(
 idx <- which(nchar(levels(polls$Poll)) %% 2 == 0)
 
 
-mpolls <- melt(polls, measure.vars=4:14, na.rm=TRUE)
+mpolls <- melt(polls, measure.vars=5:9, na.rm=TRUE)
 mpolls <- subset(mpolls, Poll != "RCP Average")
 
 
@@ -59,7 +59,7 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
     cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black", "black", "black", "black")
 #    mpolls$voterType <- factor(mpolls$voterType, c("RV", "LV", "A"))
     
-    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year >= 2016))) +
+    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year >= 2016) & (month >= 2))) +
       caucuslayer(max(mpolls$value), party="R") +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value), size=2.5) + 
@@ -112,7 +112,7 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
     cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black")
     mpolls$voterType <- factor(mpolls$voterType, c("LV", "RV", "A"))
     
-    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year==2016) | (year >=2015 & month >=10))) +
+    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year==2016) & (month >=2))) +
       caucuslayer(max(mpolls$value), party="D") +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value, shape=voterType), size=2.5) + 
