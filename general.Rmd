@@ -6,33 +6,23 @@ output: html_document
 ---
 
 
-```{r, echo=FALSE, fig.width=7, fig.height=5, message=FALSE}
+```{r, echo=FALSE, fig.width=7, fig.height=5, message=FALSE, warning = FALSE}
 library(XML)
 library(lubridate)
-library(plyr)
+library(stringr)
+library(dplyr)
 library(reshape2)
 library(ggplot2)
 library(RColorBrewer)
 
 ###############
 #  functions
-sub <- function(x, replace=c("--"), by=NA) {
-  x <- as.character(x)
-  idx <- which(x %in% replace)
-  if (length(idx) > 0) x[idx] <- by
-  x
-}
+source("functions.R")
 
-fixYear <- function(date) {
-  month <- month(date)
-  dm <- c(0, diff(month))
-  cdm <- cumsum(dm > 2)
-  2015 - cdm
-}
 
 plotCandidates <- function(rcp.gen) {
   tables <- readHTMLTable(rcp.gen)
-  dims <- ldply(tables, function(x) if (is.null(x)) c(0,0) else dim(x))
+  dims <- plyr::ldply(tables, function(x) if (is.null(x)) c(0,0) else dim(x))
   gen <- data.frame(tables[[which.max(dims[,2])]])
 #  gen <- gen[nrow(gen):1,]
   gen <- subset(gen, Poll != "RCP Average")
@@ -41,8 +31,10 @@ plotCandidates <- function(rcp.gen) {
   write.csv(genNA, "temp.csv", row.names=FALSE)
   gen <- read.csv("temp.csv")
   
+  gen$Poll <- fixName(gen$Poll)
+
   dates <- strsplit(as.character(gen$Date), split=" - ")
-  d2 <- ldply(dates, function(x) data.frame(
+  d2 <- plyr::ldply(dates, function(x) data.frame(
     startDate = mdy(paste(x[1],"15", sep="/")),
     endDate = mdy(paste(x[2],"15", sep="/"))))
   year(d2$startDate) <- fixYear(d2$startDate)
@@ -98,18 +90,22 @@ plotCandidates <- function(rcp.gen) {
 ############
 plotCandidates("http://www.realclearpolitics.com/epolls/2016/president/us/general_election_trump_vs_clinton-5491.html")
 
-plotCandidates("http://www.realclearpolitics.com/epolls/2016/president/us/general_election_fiorina_vs_clinton-5470.html")
+#plotCandidates("http://www.realclearpolitics.com/epolls/2016/president/us/general_election_fiorina_vs_clinton-5470.html")
 
-plotCandidates("http://www.realclearpolitics.com/epolls/2016/president/us/general_election_bush_vs_clinton-3827.html")
+#plotCandidates("http://www.realclearpolitics.com/epolls/2016/president/us/general_election_bush_vs_clinton-3827.html")
 
-plotCandidates("http://www.realclearpolitics.com/epolls/2016/president/us/general_election_trump_vs_biden-5568.html")
+#plotCandidates("http://www.realclearpolitics.com/epolls/2016/president/us/general_election_trump_vs_biden-5568.html")
 
-plotCandidates("http://www.realclearpolitics.com/epolls/2016/president/us/general_election_bush_vs_biden-3828.html")
 
 plotCandidates("http://www.realclearpolitics.com/epolls/2016/president/us/general_election_trump_vs_sanders-5565.html")
 
-plotCandidates("http://www.realclearpolitics.com/epolls/2016/president/us/general_election_bush_vs_sanders-5563.html")
+plotCandidates("http://www.realclearpolitics.com/epolls/2016/president/us/general_election_cruz_vs_clinton-4034.html")
 
+plotCandidates("http://www.realclearpolitics.com/epolls/2016/president/us/general_election_cruz_vs_sanders-5742.html")
+
+plotCandidates("http://www.realclearpolitics.com/epolls/2016/president/us/general_election_rubio_vs_clinton-3767.html")
+
+plotCandidates("http://www.realclearpolitics.com/epolls/2016/president/us/general_election_rubio_vs_sanders-5564.html")
 
 
 ```

@@ -17,6 +17,7 @@ fixName <- function(name) {
   name <- gsub(" (Tracking)", "", name, fixed=TRUE)
   name <- gsub("Mrng.", "Morning", name, fixed=TRUE)
   name <- name %>% str_replace_all("CBS News", "CBS") %>%
+    str_replace_all("Opinion Research", "ORC") %>%
     str_replace_all("ABC News", "ABC") %>%
     str_replace_all("NY Times", "NYT") %>%
     str_replace_all("NBC News", "NBC") %>%
