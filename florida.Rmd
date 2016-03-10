@@ -14,6 +14,7 @@ library(ggplot2)
 library(RColorBrewer)
 
 source("caucus.R")
+caucus <- subset(caucus, month(Date) > 2)
 ###############
 #  functions
 source("functions.R")
@@ -51,7 +52,7 @@ s2 <- plyr::ldply(samples, function(x) data.frame(
 idx <- which(nchar(levels(polls$Poll)) %% 2 == 0)
 
 
-mpolls <- melt(polls, measure.vars=5:9, na.rm=TRUE)
+mpolls <- melt(polls, measure.vars=5:8, na.rm=TRUE)
 mpolls <- subset(mpolls, Poll != "RCP Average")
 
 
