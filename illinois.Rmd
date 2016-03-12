@@ -1,10 +1,10 @@
 ---
-title: "Presidential Candidates in North Carolina"
+title: "Presidential Candidates in Illinois"
 author: "Heike Hofmann"
 output: html_document
 ---
 
-```{r, echo=FALSE, fig.width=10, fig.height=7.5, message=FALSE, warning = FALSE}
+```{r, echo=FALSE, fig.width=10, fig.height=10, message=FALSE, warning = FALSE}
 library(XML)
 library(lubridate)
 library(dplyr)
@@ -14,15 +14,16 @@ library(ggplot2)
 library(RColorBrewer)
 
 source("caucus.R")
+caucus <- subset(caucus, month(Date) > 2)
 ###############
 #  functions
 source("functions.R")
 ###############
 # show! 
-rcp.gop <- "http://www.realclearpolitics.com/epolls/2016/president/nc/north_carolina_republican_presidential_primary-3491.html"
+rcp.gop <- "http://www.realclearpolitics.com/epolls/2016/president/il/illinois_republican_presidential_primary-4251.html"
 
 tables <- readHTMLTable(rcp.gop)
-polls <- data.frame(tables[[4]])
+polls <- data.frame(tables[[2]])
 
 pollsNA <- lapply(polls, sub)
 write.csv(pollsNA, "temp.csv", row.names=FALSE)
@@ -59,7 +60,7 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
     cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black", "black", "black", "black")
 #    mpolls$voterType <- factor(mpolls$voterType, c("RV", "LV", "A"))
     
-    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year >= 2016))) +
+    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year >= 2016) & (month >= 2))) +
       caucuslayer(max(mpolls$value), party="R") +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value), size=2.5) + 
@@ -73,10 +74,10 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
 ```
 
 ```{r, echo=FALSE, fig.width=7.5, fig.height=5, warning=FALSE}
-rcp.dem <- "http://www.realclearpolitics.com/epolls/2016/president/nc/north_carolina_democratic_presidential_primary-5175.html"
+rcp.dem <- "http://www.realclearpolitics.com/epolls/2016/president/fl/florida_democratic_presidential_primary-3556.html"
 
 tables <- readHTMLTable(rcp.dem)
-polls <- data.frame(tables[[2]])
+polls <- data.frame(tables[[4]])
 
 pollsNA <- lapply(polls, sub)
 write.csv(pollsNA, "temp.csv", row.names=FALSE)
@@ -112,7 +113,7 @@ mpolls <- subset(mpolls, Poll != "RCP Average")
     cols <- c(brewer.pal(12, name="Paired"), "grey30", "grey50", "grey70", "grey80", "grey60", "black", "black")
     mpolls$voterType <- factor(mpolls$voterType, c("LV", "RV", "A"))
     
-    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year==2016) | (year >=2015 & month >=10))) +
+    p <- ggplot(aes(x=endDate, y=value, colour=Poll), data=subset(mpolls, (year==2016) & (month >=2))) +
       caucuslayer(max(mpolls$value), party="D") +
       geom_smooth(aes(group=variable), colour="grey30", se=FALSE, size=.75) +
       geom_point(aes(x=endDate, y=value, shape=voterType), size=2.5) + 
